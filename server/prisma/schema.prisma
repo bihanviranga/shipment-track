@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+    Client
+    Admin
+}
+
+model User {
+  userID        String      @id @default(uuid())
+  name          String
+  address       String
+  passwordHash  String
+  email         String      @unique
+  role          Role        @default(Client)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  shipments     Shipment[]
+}
+
+model ShipmentStatus {
+  statusID          String              @id @default(uuid())
+  name              String
+  description       String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now()) @updatedAt
+  shipments         Shipment[]
+  shipmentTracking  ShipmentTracking[]
+}
+
+model Shipment {
+  shipmentID        String              @id @default(uuid())
+  sender            User                @relation(fields: [senderID], references: [userID])
+  senderID          String
+  recipientName     String
+  recipientAddress  String
+  status            ShipmentStatus      @relation(fields: [statusID], references: [statusID])
+  statusID          String
+  trackingNumber    String              @unique
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now()) @updatedAt
+  shipmentTracking  ShipmentTracking[]
+}
+
+model ShipmentTracking {
+  ID                String          @id @default(uuid())
+  shipment          Shipment        @relation(fields: [shipmentID], references: [shipmentID])
+  shipmentID        String
+  shipmentStatus    ShipmentStatus  @relation(fields: [shipmentStatusID], references: [statusID])
+  shipmentStatusID  String
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @default(now()) @updatedAt
+}
