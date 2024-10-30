@@ -1,11 +1,11 @@
 import express from 'express';
 import authController from '@/controllers/authController';
 import { validateRequest } from '@/middleware/requestValidation';
-import { registerInputSchema } from '@/dto/authDto';
+import { registerInputSchema, loginInputSchema } from '@/dto/authDto';
 
 const router = express.Router();
 
 router.post('/register', validateRequest(registerInputSchema), authController.register);
-router.post('/login', authController.login);
+router.post('/login', validateRequest(loginInputSchema), authController.login);
 
 export default router;

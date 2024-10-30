@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import authService from '@/services/authService';
-import type { RegisterInputDto } from '@/dto/authDto';
+import type { LoginInputDto, RegisterInputDto } from '@/dto/authDto';
 
 const register = async (req: Request, res: Response) => {
   const payload = req.body as RegisterInputDto;
@@ -14,12 +14,17 @@ const register = async (req: Request, res: Response) => {
     passwordHash: undefined,
   };
 
-  res.json(response);
+  res.status(201).json(response);
 };
 
-const login = async (req: Request, res: Response) => {
-  await authService.login();
-  res.json({ endpoint: 'login' });
+const login = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload = req.body as LoginInputDto;
+    const response = await authService.login(payload);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export default {
