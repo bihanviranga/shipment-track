@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import db from '@/db';
 import { LoginInputDto, RegisterInputDto } from '@/dto/authDto';
 import { ApiError, ErrorCode } from '@/util/error';
+import { UserRole } from '@/consts/user';
 
 const PASSWORD_SALT_ROUNDS = parseInt(process.env.PASSWORD_SALT_ROUNDS || '10');
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -41,7 +42,8 @@ const login = async (payload: LoginInputDto) => {
       throw new ApiError(ErrorCode.BAD_REQUEST, 'Invalid username/password');
     }
 
-    const token = jwt.sign({ userID: user.userID, email: user.email, role: user.role }, JWT_SECRET);
+    const userRole = user.role === 'Admin' ? UserRole.ADMIN : UserRole.CLIENT;
+    const token = jwt.sign({ userID: user.userID, email: user.email, role: userRole }, JWT_SECRET);
     console.log(`[authService] ${new Date()}: User ${payload.email} logged in`);
 
     return { token };

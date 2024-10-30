@@ -2,6 +2,7 @@ import db from '@/db';
 import { CreateShipmentDto } from '@/dto/shipmentDto';
 import { ShipmentStatus } from '@/consts/shipment';
 import { ApiError, ErrorCode } from '@/util/error';
+import { UserRole } from '@/consts/user';
 
 const createShipment = async (payload: CreateShipmentDto, userID: string) => {
   const processingStatus = await db.shipmentStatus.findFirst({
@@ -25,4 +26,21 @@ const createShipment = async (payload: CreateShipmentDto, userID: string) => {
   return createdShipment;
 };
 
-export default { createShipment };
+const getAllShipments = async (userID: string, userRole: UserRole) => {
+  const queryCondition: { senderID?: string } = {};
+
+  if (userRole === UserRole.CLIENT) {
+    queryCondition.senderID = userID;
+  }
+
+  const shipments = await db.shipment.findMany({
+    where: queryCondition,
+  });
+
+  return shipments;
+};
+
+export default {
+  createShipment,
+  getAllShipments,
+};

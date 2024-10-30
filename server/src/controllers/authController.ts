@@ -14,14 +14,14 @@ const register = async (req: Request, res: Response) => {
     passwordHash: undefined,
   };
 
-  res.status(201).json(response);
+  res.status(201).json({ data: response });
 };
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = req.body as LoginInputDto;
     const response = await authService.login(payload);
-    res.json(response);
+    res.json({ data: response });
   } catch (error) {
     next(error);
   }
