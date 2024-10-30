@@ -1,5 +1,5 @@
 import { CreateShipmentDto } from '@/dto/shipmentDto';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import shipmentService from '@/services/shipmentService';
 import { UserRole } from '@/consts/user';
 
@@ -10,8 +10,16 @@ const getAllShipments = async (req: any, res: Response) => {
   res.json({ data: shipments });
 };
 
-const getShipmentById = async (req: Request, res: Response) => {
-  res.json({ endpoint: 'getShipmentById' });
+const getShipmentByID = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    const userID = req.user.userID;
+    const userRole = req.user.role as UserRole;
+    const shipmentID = req.params.shipmentID;
+    const shipment = await shipmentService.getShipmentByID(shipmentID, userID, userRole);
+    res.json({ data: shipment });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const createShipment = async (req: any, res: Response) => {
@@ -26,7 +34,7 @@ const updateShipment = async (req: Request, res: Response) => {
 
 export default {
   getAllShipments,
-  getShipmentById,
+  getShipmentByID,
   createShipment,
   updateShipment,
 };

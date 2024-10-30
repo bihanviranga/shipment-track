@@ -40,7 +40,28 @@ const getAllShipments = async (userID: string, userRole: UserRole) => {
   return shipments;
 };
 
+const getShipmentByID = async (shipmentID: string, userID: string, userRole: UserRole) => {
+  const queryCondition: any = {
+    shipmentID,
+  };
+
+  if (userRole === UserRole.CLIENT) {
+    queryCondition.senderID = userID;
+  }
+
+  const shipment = await db.shipment.findUnique({
+    where: queryCondition,
+  });
+
+  if (!shipment) {
+    throw new ApiError(ErrorCode.NOT_FOUND, 'Shipment with given ID not found');
+  }
+
+  return shipment;
+};
+
 export default {
   createShipment,
   getAllShipments,
+  getShipmentByID,
 };

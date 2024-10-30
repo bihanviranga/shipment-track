@@ -6,7 +6,7 @@ import { createShipmentSchema } from '@/dto/shipmentDto';
 const router = express.Router();
 
 router.get('/', shipmentController.getAllShipments);
-router.get('/:id', shipmentController.getShipmentById);
+router.get('/:shipmentID', shipmentController.getShipmentByID);
 router.post('/', validateRequest(createShipmentSchema), shipmentController.createShipment);
 router.put('/:id', shipmentController.updateShipment);
 
