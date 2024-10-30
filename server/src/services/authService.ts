@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import db from '@/db';
 import { RegisterInputDto } from '@/dto/authDto';
 
-const PASSWORD_SALT_ROUNDS = 10;
+const PASSWORD_SALT_ROUNDS = parseInt(process.env.PASSWORD_SALT_ROUNDS || '10');
 
 const register = async (payload: RegisterInputDto) => {
   try {
