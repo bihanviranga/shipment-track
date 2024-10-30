@@ -9,3 +9,11 @@ export const createShipmentSchema = z
   .strict();
 
 export type CreateShipmentDto = z.infer<typeof createShipmentSchema>;
+
+export const updateShipmentSchema = z
+  .object({
+    statusID: z.string().min(1),
+  })
+  .strict();
+
+export type UpdateShipmentDto = z.infer<typeof updateShipmentSchema>;

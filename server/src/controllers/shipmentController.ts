@@ -1,7 +1,8 @@
-import { CreateShipmentDto } from '@/dto/shipmentDto';
+import { CreateShipmentDto, UpdateShipmentDto } from '@/dto/shipmentDto';
 import { NextFunction, Request, Response } from 'express';
 import shipmentService from '@/services/shipmentService';
 import { UserRole } from '@/consts/user';
+import { ApiError, ErrorCode } from '@/util/error';
 
 const getAllShipments = async (req: any, res: Response) => {
   const userID = req.user.userID;
@@ -28,8 +29,22 @@ const createShipment = async (req: any, res: Response) => {
   res.status(201).json({ shipment });
 };
 
-const updateShipment = async (req: Request, res: Response) => {
-  res.json({ endpoint: 'updateShipment' });
+const updateShipment = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    // Currently only admins can update shipments.
+    const userRole = req.user.role as UserRole;
+    if (userRole !== UserRole.ADMIN) {
+      throw new ApiError(ErrorCode.FORBIDDEN, 'Not permitted to perform that action');
+    }
+
+    const shipmentID = req.params.shipmentID;
+    const payload = req.body as UpdateShipmentDto;
+
+    const response = await shipmentService.updateShipment(shipmentID, payload);
+    res.json({ data: response });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export default {
