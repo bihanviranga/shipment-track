@@ -1,11 +1,13 @@
 import express from 'express';
-import { createShipment, getAllShipments, getShipmentById, updateShipment } from '@/controllers/shipmentController';
+import shipmentController from '@/controllers/shipmentController';
+import { validateRequest } from '@/middleware/requestValidation';
+import { createShipmentSchema } from '@/dto/shipmentDto';
 
 const router = express.Router();
 
-router.get('/', getAllShipments);
-router.get('/:id', getShipmentById);
-router.post('/', createShipment);
-router.put('/:id', updateShipment);
+router.get('/', shipmentController.getAllShipments);
+router.get('/:id', shipmentController.getShipmentById);
+router.post('/', validateRequest(createShipmentSchema), shipmentController.createShipment);
+router.put('/:id', shipmentController.updateShipment);
 
 export default router;
