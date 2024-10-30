@@ -20,7 +20,30 @@ const createAdmin = async () => {
   console.log('[seed]: Created admin:', admin);
 };
 
-createAdmin()
+const populateShipmentStatus = async () => {
+  const data = [
+    { name: 'PROCESSING', description: 'Shipment is being processed.' },
+    { name: 'READY TO SHIP', description: 'Shipment has been processed, and is ready to be shipped.' },
+    { name: 'IN TRANSIT', description: 'Shipment is being transported.' },
+    { name: 'DELIVERED', description: 'Shipment has been delivered.' },
+    { name: 'DELIVERY FAILED', description: 'Delivery failed, awaiting re-try.' },
+    { name: 'CANCELLED', description: 'Delivery of the shipment has been cancelled.' },
+    { name: 'DELAYED', description: 'Delivery has been delayed.' },
+  ];
+
+  await db.shipmentStatus.createMany({
+    data,
+  });
+
+  console.log('[seed] Created default statuses:', data);
+};
+
+const main = async () => {
+  await createAdmin();
+  await populateShipmentStatus();
+};
+
+main()
   .then(async () => {
     await db.$disconnect();
   })
