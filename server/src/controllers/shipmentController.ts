@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
-export const getAllShipments = async (req: Request, res: Response): Promise<void> => {
+export const getAllShipments = async (req: any, res: Response): Promise<void> => {
+  console.log('[getallshipments] req.user:', req.user);
   res.json({ endpoint: 'getAllShipments' });
 };
 
