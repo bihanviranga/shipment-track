@@ -4,6 +4,7 @@ import SignUpPage from '../pages/SignUp';
 import DashboardPage from '../pages/Dashboard';
 import AppLayout from '../layouts/appLayout';
 import CreateShipment from '../pages/CreateShipment';
+import TrackPage from '../pages/Track';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/signup',
     element: <SignUpPage />,
+  },
+  {
+    path: '/track/:trackingNumber',
+    element: <TrackPage />,
   },
 ]);
 

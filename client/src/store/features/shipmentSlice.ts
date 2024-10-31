@@ -51,6 +51,15 @@ export const updateShipment = createAsyncThunk('shipment/update', async (payload
   }
 });
 
+export const trackShipment = createAsyncThunk('shipment/track', async (payload: any, thunkAPI) => {
+  try {
+    const response = await api.trackShipment(payload);
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
+
 export const shipmentSlice = createSlice({
   name: 'shipmentSlice',
   initialState,

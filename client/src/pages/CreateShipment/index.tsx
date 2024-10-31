@@ -49,7 +49,7 @@ export default function CreateShipment() {
         <label htmlFor="senderAddress" style={stylesMui.label}>
           Sender Address
         </label>
-        <input type="text" name="senderAddress" style={stylesMui.fieldDisabled} disabled value={userInfo?.address} />
+        <input type="text" name="senderAddress" style={stylesMui.fieldDisabled} disabled value={userInfo.address} />
 
         <label htmlFor="recipientName" style={stylesMui.label}>
           Recipient Name
