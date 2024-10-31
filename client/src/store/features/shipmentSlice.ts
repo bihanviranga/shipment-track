@@ -13,11 +13,19 @@ const initialState: ShipmentState = {
 
 export const getAllShipments = createAsyncThunk('shipment/getAll', async (_, thunkAPI) => {
   try {
-    console.log('dispatching fetch all!');
     const response = await api.getAllShipments();
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
+
+export const createShipment = createAsyncThunk('shipment/create', async (payload: any, thunkAPI) => {
+  try {
+    const response = await api.createShipment(payload);
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.resposne.data);
   }
 });
 
@@ -31,6 +39,7 @@ export const shipmentSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Get all shipments
     builder.addCase(getAllShipments.pending, (state) => {
       state.loading = true;
     });
@@ -41,6 +50,21 @@ export const shipmentSlice = createSlice({
     });
 
     builder.addCase(getAllShipments.rejected, (state) => {
+      state.loading = false;
+    });
+
+    // Create shipment
+    builder.addCase(createShipment.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(createShipment.fulfilled, (state, action) => {
+      state.loading = false;
+      const newShipments = [...state.shipments, action.payload.shipment];
+      state.shipments = newShipments;
+    });
+
+    builder.addCase(createShipment.rejected, (state, action) => {
       state.loading = false;
     });
   },
