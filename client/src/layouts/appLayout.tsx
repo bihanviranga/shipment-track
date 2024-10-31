@@ -21,9 +21,12 @@ export default function AppLayout() {
           console.log('Protected header:', protectedHeader);
         } catch (err) {
           // Token is invalid or expired
+          localStorage.removeItem('token');
           console.error('Error verifying token:', err);
           navigate('/login');
         }
+      } else {
+        navigate('/login');
       }
     };
 
