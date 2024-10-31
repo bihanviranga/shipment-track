@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const AUTH_API_BASE = 'http://localhost:8000/api/v1/auth';
 
@@ -7,12 +7,14 @@ interface AuthState {
   loginState: 'success' | 'fail' | 'progress' | null;
   signUpState: 'success' | 'fail' | 'progress' | null;
   authMessage: string | null;
+  user: object | null;
 }
 
 const initialState: AuthState = {
   loginState: null,
   signUpState: null,
   authMessage: null,
+  user: null,
 };
 
 export const login = createAsyncThunk('auth/login', async (loginInput: { email: string; password: string }, thunkAPI) => {
@@ -36,13 +38,21 @@ export const signUp = createAsyncThunk('auth/signUp', async (signUpInput: any, t
 export const authSlice = createSlice({
   name: 'authSlice',
   initialState,
-  reducers: {},
+  reducers: {
+    setUser: (state, action: PayloadAction<object>) => {
+      state.user = action.payload;
+    },
+    resetUser: (state) => {
+      state.user = null;
+    },
+  },
   extraReducers: (builder) => {
     // Login reducers
     builder.addCase(login.fulfilled, (state, action) => {
       localStorage.setItem('token', action.payload.data.token);
       state.loginState = 'success';
       state.authMessage = null;
+      console.log('login complete!');
     });
 
     builder.addCase(login.pending, (state) => {
@@ -72,5 +82,7 @@ export const authSlice = createSlice({
     });
   },
 });
+
+export const { setUser, resetUser } = authSlice.actions;
 
 export default authSlice.reducer;
