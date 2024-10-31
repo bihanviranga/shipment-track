@@ -23,6 +23,6 @@ const styles = {
   },
 
   formContainer: {
-    pt: '200px',
+    pt: '70px',
   },
 };

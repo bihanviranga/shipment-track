@@ -6,12 +6,16 @@ import { RouterProvider } from 'react-router-dom';
 import router from './routes';
 import theme from './theme';
 import { ThemeProvider } from '@emotion/react';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </ThemeProvider>
   </React.StrictMode>,
 );
