@@ -4,11 +4,15 @@ import api from '../../api/api';
 interface ShipmentState {
   shipments: Array<any>;
   loading: boolean;
+  status: Array<any>;
+  updatingShipment: string | null;
 }
 
 const initialState: ShipmentState = {
   shipments: [],
   loading: false,
+  status: [],
+  updatingShipment: null,
 };
 
 export const getAllShipments = createAsyncThunk('shipment/getAll', async (_, thunkAPI) => {
@@ -26,6 +30,24 @@ export const createShipment = createAsyncThunk('shipment/create', async (payload
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.resposne.data);
+  }
+});
+
+export const getAllStatus = createAsyncThunk('shipment/statusAll', async (_, thunkAPI) => {
+  try {
+    const response = await api.getAllStatus();
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
+
+export const updateShipment = createAsyncThunk('shipment/update', async (payload: any, thunkAPI) => {
+  try {
+    const response = await api.updateShipment(payload.shipmentID, { statusID: payload.statusID });
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data);
   }
 });
 
@@ -64,8 +86,34 @@ export const shipmentSlice = createSlice({
       state.shipments = newShipments;
     });
 
-    builder.addCase(createShipment.rejected, (state, action) => {
+    builder.addCase(createShipment.rejected, (state) => {
       state.loading = false;
+    });
+
+    // Get all status
+    builder.addCase(getAllStatus.fulfilled, (state, action) => {
+      state.status = action.payload.data;
+    });
+
+    // Update shipment
+    builder.addCase(updateShipment.pending, (state, action) => {
+      state.updatingShipment = action.meta.arg.shipmentID;
+    });
+
+    builder.addCase(updateShipment.fulfilled, (state, action) => {
+      const updatedShipment = action.payload.data;
+      const newShipments = state.shipments.map((shipment) => {
+        if (shipment.shipmentID === updatedShipment.shipmentID) {
+          return updatedShipment;
+        }
+        return shipment;
+      });
+      state.shipments = newShipments;
+      state.updatingShipment = null;
+    });
+
+    builder.addCase(updateShipment.rejected, (state) => {
+      state.updatingShipment = null;
     });
   },
 });

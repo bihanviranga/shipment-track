@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { getAllShipments } from '../../store/features/shipmentSlice';
+import { getAllShipments, getAllStatus, updateShipment } from '../../store/features/shipmentSlice';
 import styles from './dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,13 +11,23 @@ export default function Dashboard() {
 
   const shipments = useAppSelector((state) => state.shipment.shipments);
   const loading = useAppSelector((state) => state.shipment.loading);
+  const userInfo: any = useAppSelector((state) => state.auth.user);
+  const status = useAppSelector((state) => state.shipment.status);
+  const updatingShipmentID = useAppSelector((state) => state.shipment.updatingShipment);
+
+  const isAdmin = userInfo?.role === 'ADMIN';
 
   const handleCreateButtonClick = () => {
     navigate('/create');
   };
 
+  const handleStatusChange = (shipmentID: string, event: SelectChangeEvent) => {
+    dispatch(updateShipment({ shipmentID, statusID: event.target.value }));
+  };
+
   useEffect(() => {
     dispatch(getAllShipments());
+    dispatch(getAllStatus());
   }, []);
 
   return (
@@ -42,15 +52,40 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {shipments.map((shipment) => (
-              <tr key={shipment.shipmentID}>
-                <td>{shipment.recipientAddress}</td>
-                <td>{shipment.recipientName}</td>
-                <td>{shipment.trackingNumber}</td>
-                <td>{shipment.status.name}</td>
-                <td>{shipment.updatedAt}</td>
-              </tr>
-            ))}
+            {shipments.map((shipment) => {
+              if (shipment.shipmentID === updatingShipmentID) {
+                return <tr key={shipment.shipmentID}>Loading..............</tr>;
+              } else {
+                return (
+                  <tr key={shipment.shipmentID}>
+                    <td>{shipment.recipientAddress}</td>
+                    <td>{shipment.recipientName}</td>
+                    <td>{shipment.trackingNumber}</td>
+                    <td>
+                      {isAdmin && status.length > 0 ? (
+                        <Select
+                          sx={{ height: '35px', width: '75%' }}
+                          value={shipment.status.statusID}
+                          onChange={(e) => {
+                            handleStatusChange(shipment.shipmentID, e);
+                          }}
+                        >
+                          {status.map((st) => (
+                            <MenuItem key={st.statusID} value={st.statusID}>
+                              {st.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        shipment.status.name
+                      )}
+                      {}
+                    </td>
+                    <td>{shipment.updatedAt}</td>
+                  </tr>
+                );
+              }
+            })}
           </tbody>
         </table>
         {shipments.length === 0 && (
