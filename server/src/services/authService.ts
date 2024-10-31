@@ -43,7 +43,7 @@ const login = async (payload: LoginInputDto) => {
     }
 
     const userRole = user.role === 'Admin' ? UserRole.ADMIN : UserRole.CLIENT;
-    const token = jwt.sign({ userID: user.userID, email: user.email, role: userRole }, JWT_SECRET);
+    const token = jwt.sign({ ...user, role: userRole }, JWT_SECRET);
     console.log(`[authService] ${new Date()}: User ${payload.email} logged in`);
 
     return { token };

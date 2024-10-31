@@ -79,7 +79,33 @@ const updateShipment = async (shipmentID: string, payload: UpdateShipmentDto) =>
     },
   });
 
+  const shipmentTracking = await db.shipmentTracking.create({
+    data: {
+      shipmentID: shipmentID,
+      shipmentStatusID: payload.statusID,
+    },
+  });
+
   return updatedShipment;
+};
+
+const trackShipment = async (trackingNumber: string) => {
+  const shipment = await db.shipment.findFirst({
+    where: { trackingNumber },
+    select: { shipmentID: true },
+  });
+
+  if (!shipment) {
+    throw new ApiError(ErrorCode.NOT_FOUND, 'Shipment with given tracking number not found');
+  }
+
+  const shipmentTrackings = await db.shipmentTracking.findMany({
+    where: { shipmentID: shipment.shipmentID },
+    include: { shipmentStatus: true },
+    orderBy: { updatedAt: 'desc' },
+  });
+
+  return shipmentTrackings;
 };
 
 export default {
@@ -87,4 +113,5 @@ export default {
   getAllShipments,
   getShipmentByID,
   updateShipment,
+  trackShipment,
 };
