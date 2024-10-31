@@ -1,0 +1,10 @@
+.table {
+  border: 1px solid grey;
+  padding: 5px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.table > thead {
+  font-weight: 700;
+}

@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import * as jose from 'jose';
+import Navbar from '../components/Navbar';
+import { useAppDispatch } from '../store';
+import { setUser } from '../store/features/authSlice';
 
 const JWT_SECRET = (process.env.REACT_APP_JWT_SECRET || '') as string;
 
 export default function AppLayout() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const verifyJWT = async () => {
@@ -19,6 +23,7 @@ export default function AppLayout() {
           const { payload, protectedHeader } = await jose.jwtVerify(token, secretKeyBuffer);
           console.log('Verified payload:', payload);
           console.log('Protected header:', protectedHeader);
+          dispatch(setUser(payload));
         } catch (err) {
           // Token is invalid or expired
           localStorage.removeItem('token');
@@ -35,8 +40,10 @@ export default function AppLayout() {
 
   return (
     <Box>
-      <Typography>Layout!!!</Typography>
-      <Outlet />
+      <Navbar />
+      <Box sx={{ mt: '50px' }}>
+        <Outlet />
+      </Box>
     </Box>
   );
 }
